@@ -1,0 +1,148 @@
+table Inpatient
+	isHidden
+	lineageTag: c871a2cb-761b-4d83-8aaf-640876dbd25f
+
+	column 'Nome da Origem'
+		dataType: string
+		isHidden
+		lineageTag: 658194fb-497d-4d3d-8802-bac8f0231740
+		summarizeBy: none
+		sourceColumn: Nome da Origem
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data_Arquivo
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: ce50e618-aac9-4908-91f5-30b5a5409984
+		summarizeBy: none
+		sourceColumn: Data_Arquivo
+
+		variation Variation
+			isDefault
+			relationship: f17860b5-b257-4dae-8107-bd689719b963
+			defaultHierarchy: LocalDateTable_639ab70b-c9e7-415b-af72-5a0351ff2c27.'Hierarquia de datas'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Especialidade_HIPE
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 72d59609-c7ef-4df5-8571-16ac9a8ef983
+		summarizeBy: sum
+		sourceColumn: Especialidade_HIPE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nome_Especialidade
+		dataType: string
+		isHidden
+		lineageTag: 6efd958e-2556-46ef-8b03-10c81083ac84
+		summarizeBy: none
+		sourceColumn: Nome_Especialidade
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tipo_Caso
+		dataType: string
+		isHidden
+		lineageTag: bb1073b5-e2fa-4254-97f1-7c051489704f
+		summarizeBy: none
+		sourceColumn: Tipo_Caso
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Adulto_Crianca
+		dataType: string
+		isHidden
+		lineageTag: 964ba403-24a8-43d5-913f-9bfbf52973b3
+		summarizeBy: none
+		sourceColumn: Adulto_Crianca
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Perfil_Idade
+		dataType: string
+		isHidden
+		lineageTag: 5144e729-b11b-4d23-bc37-eed857f86076
+		summarizeBy: none
+		sourceColumn: Perfil_Idade
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Banda_Tempo
+		dataType: string
+		isHidden
+		lineageTag: b78f6f5c-6986-4b1f-8f53-a83e5a2f7ebf
+		summarizeBy: none
+		sourceColumn: Banda_Tempo
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Total
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 001de2ea-f036-4e17-a410-94538eab3de2
+		summarizeBy: sum
+		sourceColumn: Total
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column1
+		dataType: string
+		isHidden
+		lineageTag: b3efe583-3b18-4a09-9af3-d7a63a02aa18
+		summarizeBy: none
+		sourceColumn: Column1
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Inpatient = m
+		mode: import
+		source =
+				let
+				    Fonte = Folder.Files("C:\POWER BI\Data\Inpatient"),
+				    #"Arquivos Ocultos Filtrados1" = Table.SelectRows(Fonte, each [Attributes]?[Hidden]? <> true),
+				    #"Invocar Função Personalizada1" = Table.AddColumn(#"Arquivos Ocultos Filtrados1", "Transformar Arquivo", each #"Transformar Arquivo"([Content])),
+				    #"Colunas Renomeadas1" = Table.RenameColumns(#"Invocar Função Personalizada1", {"Name", "Nome da Origem"}),
+				    #"Outras Colunas Removidas1" = Table.SelectColumns(#"Colunas Renomeadas1", {"Nome da Origem", "Transformar Arquivo"}),
+				    #"Coluna de Tabela Expandida1" = Table.ExpandTableColumn(#"Outras Colunas Removidas1", "Transformar Arquivo", Table.ColumnNames(#"Transformar Arquivo"(#"Arquivo de Amostra"))),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Coluna de Tabela Expandida1",{{"Nome da Origem", type text}, {"Archive_Date", type date}, {"Specialty_HIPE", Int64.Type}, {"Specialty_Name", type text}, {"Case_Type", type text}, {"Adult_Child", type text}, {"Age_Profile", type text}, {"Time_Bands", type text}, {"Total", Int64.Type}, {"", type any}}),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Tipo Alterado",{{"Specialty_HIPE", "Especialidade_HIPE"}, {"Specialty_Name", "Nome_Especialidade"}, {"Case_Type", "Tipo_Caso"}, {"Adult_Child", "Adulto_Crianca"}, {"Age_Profile", "Perfil_Idade"}, {"Time_Bands", "Banda_Tempo"}}),
+				    #"Valor Substituído" = Table.ReplaceValue(#"Colunas Renomeadas","Inpatient","Paciente Internado",Replacer.ReplaceText,{"Tipo_Caso"}),
+				    #"Colunas Renomeadas2" = Table.RenameColumns(#"Valor Substituído",{{"Archive_Date", "Data_Arquivo"}}),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Colunas Renomeadas2","Day Case","Caso do dia",Replacer.ReplaceText,{"Tipo_Caso"})
+				in
+				    #"Valor Substituído1"
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

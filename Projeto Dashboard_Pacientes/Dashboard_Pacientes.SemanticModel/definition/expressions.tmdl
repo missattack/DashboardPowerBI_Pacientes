@@ -1,0 +1,86 @@
+expression 'Transformar o Arquivo de Exemplo' =
+		let
+		    Fonte = Csv.Document(Parâmetro1,[Delimiter=",", Columns=9, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true])
+		in
+		    #"Cabeçalhos Promovidos"
+	lineageTag: 4679945d-b087-4e53-9830-6c22a5dc89db
+	queryGroup: 'Transformar Arquivo de Inpatient'
+
+	annotation PBI_ResultType = Table
+
+expression Parâmetro1 = #"Arquivo de Amostra" meta [IsParameterQuery=true, BinaryIdentifier=#"Arquivo de Amostra", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: f0e63110-ccf5-4f5c-91a0-f8843840c335
+	queryGroup: 'Transformar Arquivo de Inpatient\Consultas Auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Arquivo de Amostra' =
+		let
+		    Fonte = Folder.Files("C:\POWER BI\Data\Inpatient"),
+		    Navegação1 = Fonte{0}[Content]
+		in
+		    Navegação1
+	lineageTag: 3d4eb0ff-80d9-454e-92f1-263a9a4c5c7d
+	queryGroup: 'Transformar Arquivo de Inpatient\Consultas Auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar Arquivo' =
+		let
+		    Fonte = (Parâmetro1 as binary) => let
+		    Fonte = Csv.Document(Parâmetro1,[Delimiter=",", Columns=9, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true])
+		in
+		    #"Cabeçalhos Promovidos"
+		in
+		    Fonte
+	mAttributes: [ FunctionQueryBinding = "{""exemplarFormulaName"":""Transformar o Arquivo de Exemplo""}" ]
+	lineageTag: c2bb85aa-1520-430d-8c48-0e235f0a0b4a
+	queryGroup: 'Transformar Arquivo de Inpatient\Consultas Auxiliares'
+
+	annotation PBI_ResultType = Function
+
+expression 'Transformar o Arquivo de Exemplo (2)' =
+		let
+		    Fonte = Csv.Document(Parâmetro2,[Delimiter=",", Columns=7, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true])
+		in
+		    #"Cabeçalhos Promovidos"
+	lineageTag: 0060182a-fb59-4781-a3dd-1abf1edfdbd3
+	queryGroup: 'Transformar Arquivo de Outpatient'
+
+	annotation PBI_ResultType = Table
+
+expression Parâmetro2 = #"Arquivo de Amostra (2)" meta [IsParameterQuery=true, BinaryIdentifier=#"Arquivo de Amostra (2)", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: 80b06c57-b7ff-42f0-bf89-08395f40ace7
+	queryGroup: 'Transformar Arquivo de Outpatient\Consultas Auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Arquivo de Amostra (2)' =
+		let
+		    Fonte = Folder.Files("C:\POWER BI\Data\Outpatient"),
+		    Navegação1 = Fonte{0}[Content]
+		in
+		    Navegação1
+	lineageTag: 36940191-2e44-46c4-876a-8a06652440a5
+	queryGroup: 'Transformar Arquivo de Outpatient\Consultas Auxiliares'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transformar Arquivo (2)' =
+		let
+		    Fonte = (Parâmetro2 as binary) => let
+		    Fonte = Csv.Document(Parâmetro2,[Delimiter=",", Columns=7, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true])
+		in
+		    #"Cabeçalhos Promovidos"
+		in
+		    Fonte
+	mAttributes: [ FunctionQueryBinding = "{""exemplarFormulaName"":""Transformar o Arquivo de Exemplo (2)""}" ]
+	lineageTag: c617d62e-7d3c-46ab-aaad-126e662f8571
+	queryGroup: 'Transformar Arquivo de Outpatient\Consultas Auxiliares'
+
+	annotation PBI_ResultType = Function
+

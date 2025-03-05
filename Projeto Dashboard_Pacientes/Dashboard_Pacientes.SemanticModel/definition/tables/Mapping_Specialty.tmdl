@@ -1,0 +1,35 @@
+table Mapping_Specialty
+	lineageTag: 89c3f211-f714-457d-b0c6-a25080bf6f08
+
+	column Nome_Especialidade
+		dataType: string
+		lineageTag: ee88cefe-35ce-4444-87b2-316dafe9d94a
+		summarizeBy: none
+		sourceColumn: Nome_Especialidade
+
+		annotation SummarizationSetBy = Automatic
+
+	column Grupo_Especialidade
+		dataType: string
+		lineageTag: 59994ee4-5fba-4cab-a9e4-d331f33848c9
+		summarizeBy: none
+		sourceColumn: Grupo_Especialidade
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Mapping_Specialty = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents("C:\POWER BI\Data\Mapping_Specialty.csv"),[Delimiter=",", Columns=2, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"Column1", type text}, {"Column2", type text}}),
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"Tipo Alterado", [PromoteAllScalars=true]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Specialty", type text}, {"Specialty Group", type text}}),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Tipo Alterado1",{{"Specialty", "Nome_Especialidade"}, {"Specialty Group", "Grupo_Especialidade"}})
+				in
+				    #"Colunas Renomeadas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

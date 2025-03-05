@@ -1,0 +1,22 @@
+table 'Calc Metodo'
+	lineageTag: ab1596db-3140-4269-a346-1b1de4193967
+
+	column 'Calc Metodo'
+		dataType: string
+		lineageTag: 34af6eb1-055b-4de4-9964-5fd79dc93dbd
+		summarizeBy: none
+		sourceColumn: Calc Metodo
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Calc Metodo' = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45W8k1NyUxUitWBsvKA7FgA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Calc Metodo" = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"Calc Metodo", type text}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

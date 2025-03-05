@@ -1,0 +1,145 @@
+table Todas_Tabelas
+	lineageTag: 993f7d36-4b1f-4de2-abb9-491c0672189f
+
+	measure 'Lista de Espera dos Ultimos Meses' = ```
+			CALCULATE(SUM(Todas_Tabelas[Total]),Todas_Tabelas[Data_Arquivo]=MAX(Todas_Tabelas[Data_Arquivo])) 
+			```
+		formatString: 0
+		lineageTag: eace278f-8afe-4d4a-8c4f-091681d6be89
+
+	measure 'Lista de Espera dos Ultimos Meses do Ano Anterior' = CALCULATE(MAX(Todas_Tabelas[Total]), Todas_Tabelas[Data_Arquivo] = EDATE(MAX(Todas_Tabelas[Data_Arquivo]),-12)) + 0
+		formatString: 0
+		lineageTag: 77c6cdf1-c7a2-4505-9d20-89be9668a51b
+
+	measure 'Media da Lista de Espera' = AVERAGE(Todas_Tabelas[Total])
+		lineageTag: e942f04b-7ce7-4825-8cb4-a8314bf6b6e4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Mediana da Lista de Espera' = MEDIAN(Todas_Tabelas[Total])
+		lineageTag: eeed401e-0244-4f42-80fd-7c1c2815db84
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Media/Mediana = SWITCH(VALUES('Calc Metodo'[Calc Metodo]), "Media",[Media da Lista de Espera], "Mediana",[Mediana da Lista de Espera])
+		formatString: 0.0
+		lineageTag: 9aefd986-bb64-47a4-bcb5-c641ff1d14e7
+
+	measure 'Titulo Dinamico' = ```
+			SWITCH(VALUES('Calc Metodo'[Calc Metodo]), "Media","KPI Lista de Espera de Pacientes (média)", "Mediana","KPI Lista de Espera de Pacientes (mediana)") 
+			```
+		lineageTag: 20e720dd-57e7-4571-b845-41652082b5a7
+
+	measure SemDadosEsq = IF(ISBLANK(CALCULATE(SUM(Todas_Tabelas[Total]),Todas_Tabelas[Tipo_Caso]<>"Paciente Ambulatório")),"Sem dados para o critério de seleção","")
+		lineageTag: e181333d-b443-43d8-97c2-06fb6003ea7d
+
+	measure SemDadosDir = IF(ISBLANK(CALCULATE(SUM(Todas_Tabelas[Total]),Todas_Tabelas[Tipo_Caso]="Paciente Ambulatório")),"Sem dados para o critério de seleção","")
+		lineageTag: 56ebad2c-8f57-41a4-9958-ba5ee773bf2a
+
+	column 'Nome da Origem'
+		dataType: string
+		lineageTag: 6063ff93-3ffc-45a5-8e25-c3260d81cd38
+		summarizeBy: none
+		sourceColumn: Nome da Origem
+
+		annotation SummarizationSetBy = Automatic
+
+	column Especialidade_HIPE
+		dataType: int64
+		formatString: 0
+		lineageTag: 6d6ca089-5283-4d46-855d-529154d786c8
+		summarizeBy: sum
+		sourceColumn: Especialidade_HIPE
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nome_Especialidade
+		dataType: string
+		lineageTag: 9155ad25-a9ef-4d57-b09c-7c88940b7e55
+		summarizeBy: none
+		sourceColumn: Nome_Especialidade
+
+		annotation SummarizationSetBy = Automatic
+
+	column Adulto_Crianca
+		dataType: string
+		lineageTag: 9c8acf83-5832-40fe-8b5a-1d2c8653e2b1
+		summarizeBy: none
+		sourceColumn: Adulto_Crianca
+
+		annotation SummarizationSetBy = Automatic
+
+	column Perfil_Idade
+		dataType: string
+		lineageTag: e5e9f77d-706f-4046-85c5-d9704f1dbf14
+		summarizeBy: none
+		sourceColumn: Perfil_Idade
+
+		annotation SummarizationSetBy = Automatic
+
+	column Total
+		dataType: int64
+		formatString: 0
+		lineageTag: 512599cf-0b1b-45c2-a95a-66f95ac114ec
+		summarizeBy: sum
+		sourceColumn: Total
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column1
+		dataType: string
+		lineageTag: dd860014-1738-4f87-ac9b-0b4c345ec244
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tipo_Caso
+		dataType: string
+		lineageTag: 5847409f-1cff-4927-b43e-09103412354e
+		summarizeBy: none
+		sourceColumn: Tipo_Caso
+
+		annotation SummarizationSetBy = Automatic
+
+	column Banda_Tempo
+		dataType: string
+		lineageTag: b429ffbc-e05e-4916-b334-55f42a74cf11
+		summarizeBy: none
+		sourceColumn: Banda_Tempo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data_Arquivo
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: fe47b60e-9710-4a1f-8410-4bbdc9916a81
+		summarizeBy: none
+		sourceColumn: Data_Arquivo
+
+		variation Variation
+			isDefault
+			relationship: b1b3c9d9-1d74-46a1-acff-2c21426fc8ce
+			defaultHierarchy: LocalDateTable_e8337198-58a8-433f-aee9-eb6cbf1b5671.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition Todas_Tabelas = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.Combine({Inpatient, Outpatient}),
+				    #"Valor Substituído" = Table.ReplaceValue(Fonte,"18 Months +","18+ Months",Replacer.ReplaceText,{"Banda_Tempo"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Valor Substituído", each true),
+				    #"Texto Aparado" = Table.TransformColumns(#"Linhas Filtradas",{{"Banda_Tempo", Text.Trim, type text}}),
+				    #"Linhas Filtradas1" = Table.SelectRows(#"Texto Aparado", each true),
+				    #"Valor Substituído1" = Table.ReplaceValue(#"Linhas Filtradas1","","Não Informado",Replacer.ReplaceValue,{"Perfil_Idade", "Banda_Tempo"})
+				in
+				    #"Valor Substituído1"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

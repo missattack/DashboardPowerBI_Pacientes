@@ -1,0 +1,19 @@
+relationship f17860b5-b257-4dae-8107-bd689719b963
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Inpatient.Data_Arquivo
+	toColumn: LocalDateTable_639ab70b-c9e7-415b-af72-5a0351ff2c27.Date
+
+relationship 1eefe256-2ce2-42b7-ba24-16907e3d16c7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Outpatient.Data_Arquivo
+	toColumn: LocalDateTable_ecc4849c-e19c-4935-b385-da1ca37cac50.Date
+
+relationship 3bf68247-5b4d-6721-3ee7-affd4a8dd602
+	fromColumn: Todas_Tabelas.Nome_Especialidade
+	toColumn: Mapping_Specialty.Nome_Especialidade
+
+relationship b1b3c9d9-1d74-46a1-acff-2c21426fc8ce
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Todas_Tabelas.Data_Arquivo
+	toColumn: LocalDateTable_e8337198-58a8-433f-aee9-eb6cbf1b5671.Date
+
